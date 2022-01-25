@@ -8,24 +8,25 @@ import {
 import Product from '../../models/Product';
 
 const initialState = {
-  // availableProducts: [],
-  // userProducts: [],
-  availableProducts: PRODUCTS,
-  userProducts: PRODUCTS.filter((prod) => prod.ownerId === 'u1'),
+  availableProducts: [],
+  userProducts: [],
+  // availableProducts: PRODUCTS,
+  // userProducts: PRODUCTS.filter((prod) => prod.ownerId === 'u1'),
 };
 
 const ProductReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_PRODUCTS:
-      console.log(SET_PRODUCTS, action.products);
+      //console.log(SET_PRODUCTS, action.products);
       return {
         availableProducts: action.products,
-        userProducts: action.products.filter((prod) => prod.ownerId === 'u1'),
+        // userProducts: action.products.filter((prod) => prod.ownerId === 'u1'),
+        userProducts: action.userProducts,
       };
     case CREATE_PRODUCT:
       const newProduct = new Product(
         action.productData.id,
-        'u1',
+        action.productData.ownerId,
         action.productData.title,
         action.productData.imageUrl,
         action.productData.description,
@@ -44,6 +45,8 @@ const ProductReducer = (state = initialState, action) => {
       const availableProductIndex = state.availableProducts.findIndex(
         (prod) => prod.id === action.pid
       );
+      //console.log('productIndex', productIndex);
+      //console.log('availableProductIndex', availableProductIndex);
 
       const updateProduct = new Product(
         action.pid,
@@ -53,12 +56,15 @@ const ProductReducer = (state = initialState, action) => {
         action.productData.description,
         state.userProducts[productIndex].price
       );
+      //console.log('updateProduct', updateProduct);
 
       const updateUserProduct = [...state.userProducts];
       updateUserProduct[productIndex] = updateProduct;
+      //console.log('updateProduct', updateProduct);
 
       const updateAvailableProducts = [...state.availableProducts];
       updateAvailableProducts[availableProductIndex] = updateProduct;
+      //console.log('updateAvailableProducts', updateAvailableProducts);
 
       return {
         ...state,

@@ -11,6 +11,8 @@ import Colors from '../../constants/Colors';
 
 const UserProductScreen = (props) => {
   const userProducts = useSelector((state) => state.products.userProducts);
+  const UID = useSelector((state) => state.auth.userId);
+
   const dispatch = useDispatch();
   const { navigation } = props;
 
@@ -28,6 +30,10 @@ const UserProductScreen = (props) => {
       },
     ]);
   };
+
+  React.useEffect(() => {
+    if (!UID) navigation.navigate('Auth');
+  }, [UID]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -58,6 +64,13 @@ const UserProductScreen = (props) => {
     });
   }, [navigation]);
 
+  if (userProducts.length === 0) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>No Product, maybe you can add some!</Text>
+      </View>
+    );
+  }
   return (
     <View>
       <FlatList

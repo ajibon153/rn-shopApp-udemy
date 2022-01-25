@@ -13,6 +13,7 @@ import * as Font from 'expo-font';
 
 import ProductReducer from './store/reducer/ProductReducer';
 import CartReducer from './store/reducer/CartReducer';
+import AuthReducer from './store/reducer/AuthReducer';
 import OrderReducer from './store/reducer/OrderReducer';
 // import ShopNavigation from './navigation/ShopNavigation';
 import MyDrawer from './navigation/Drawer';
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   products: ProductReducer,
   cart: CartReducer,
   order: OrderReducer,
+  auth: AuthReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));

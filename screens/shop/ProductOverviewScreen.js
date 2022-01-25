@@ -13,6 +13,7 @@ import Colors from '../../constants/Colors';
 
 const ProductOverviewScreen = (props) => {
   const [IsLoading, setIsLoading] = React.useState(true);
+  const [IsRefreshing, setIsRefreshing] = React.useState(true);
   const [Error, setError] = React.useState(null);
   const products = useSelector((state) => state.products.availableProducts);
   const dispatch = useDispatch();
@@ -21,7 +22,7 @@ const ProductOverviewScreen = (props) => {
 
   // // ==================== UDEMY EXPIRED ====================
   // const loadProducts = React.useCallback(async () => {
-  //   console.log('loadProducts');
+  // //console.log('loadProducts');
   //   setError(null);
   //   try {
   //     await dispatch(productActions.fetchProducts());
@@ -38,7 +39,7 @@ const ProductOverviewScreen = (props) => {
 
   //   return () => {
   //     // clear function useEffect
-  //     console.log('willFocusSub remove', willFocusSub);
+  //   //console.log('willFocusSub remove', willFocusSub);
   //     // willFocusSub.remove();
   //   };
   // }, [loadProducts]);
@@ -46,23 +47,24 @@ const ProductOverviewScreen = (props) => {
   // // ==================== END UDEMY EXPIRED ====================
 
   // ==================== NEW ====================
+
+  const loadProducts = async () => {
+    setError(null);
+    setIsRefreshing(true);
+    try {
+      //console.log(' ============ START ============ ');
+      await dispatch(productActions.fetchProducts());
+    } catch (error) {
+      // console.log(' --------- ', error, ' --------- ');
+      setError(error.message);
+    }
+    setIsRefreshing(false);
+  };
+
   useFocusEffect(
     React.useCallback(() => {
-      const loadProducts = async () => {
-        setError(null);
-        try {
-          await dispatch(productActions.fetchProducts());
-        } catch (error) {
-          setError(err.message);
-        }
-      };
-      loadProducts();
-
-      return () => {
-        // clear function useEffect
-        console.log('Clear');
-        setIsLoading(false);
-      };
+      // console.log('============ loadProducts ============');
+      loadProducts().then(() => setIsLoading(false));
     }, [dispatch, setIsLoading, setError])
   );
 
@@ -119,6 +121,8 @@ const ProductOverviewScreen = (props) => {
 
   return (
     <FlatList
+      onRefresh={loadProducts}
+      refreshing={IsRefreshing}
       data={products}
       keyExtractor={(item, i) => {
         return item.id;

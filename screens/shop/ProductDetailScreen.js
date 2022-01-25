@@ -14,11 +14,14 @@ import * as CartAction from '../../store/actions/CartAction';
 const ProductDetailScreen = (props) => {
   // const productId = props.navigation.getParam('productId');
   // const productTitle = props.navigation.getParam('productTitle');
-  const { productId, productTitle } = props.route.params;
-  props.navigation.setOptions({
-    title: productTitle,
-  });
   const dispatch = useDispatch();
+  const { productId, productTitle } = props.route.params;
+
+  React.useEffect(() => {
+    props.navigation.setOptions({
+      title: productTitle,
+    });
+  }, []);
 
   const selectedProduct = useSelector((state) =>
     state.products.availableProducts.find((prod) => prod.id === productId)

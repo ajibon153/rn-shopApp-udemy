@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
@@ -19,6 +20,7 @@ import * as productAction from '../../store/actions/ProductsAction';
 import Colors from '../../constants/Colors';
 
 const FORM_INPUT_UPDATE = 'UPDATE';
+
 const formReducer = (state, action) => {
   if (action.type === FORM_INPUT_UPDATE) {
     // console.log('action.input ==', action.input);
@@ -47,12 +49,17 @@ const formReducer = (state, action) => {
 };
 
 const EditProductScreen = (props) => {
+  const [IsLoading, setIsLoading] = React.useState(false);
+  const [Error, setError] = React.useState(null);
   const prodId = props.route.params.productId;
   const editProduct = useSelector((state) =>
     state.products.userProducts.find((prod) => prod.id === prodId)
   );
 
+  const UID = useSelector((state) => state.auth.userId);
+
   const dispatch = useDispatch();
+
   const [formState, dispatchFromState] = React.useReducer(formReducer, {
     inputValues: {
       title: editProduct ? editProduct.title : '',
@@ -82,15 +89,15 @@ const EditProductScreen = (props) => {
   //   editProduct ? editProduct.description : ''
   // );
 
+  React.useEffect(() => {
+    if (!UID) navigation.navigate('Auth');
+    if (Error) Alert.alert('An error Occurred!', Error, [{ text: 'Okay' }]);
+  }, [Error, UID]);
+
   const { navigation } = props;
 
   const onChangeInputHandler = React.useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
-      // console.log('inputValue', inputValue);
-      // console.log('inputValidity', inputValidity);
-      // console.log('inputIdentifier', inputIdentifier);
-      // console.log('========================');
-
       dispatchFromState({
         type: FORM_INPUT_UPDATE,
         value: inputValue,
@@ -101,7 +108,7 @@ const EditProductScreen = (props) => {
     [dispatchFromState]
   );
 
-  const submitHandler = React.useCallback(() => {
+  const submitHandler = React.useCallback(async () => {
     // console.log('========================');
     // console.log('formState', formState);
     if (!formState.formIsValid) {
@@ -110,29 +117,37 @@ const EditProductScreen = (props) => {
       ]);
       return;
     }
+    setError(null);
+    setIsLoading(true);
+    try {
+      if (editProduct) {
+        //console.log('====== editProduct ======', editProduct);
+        await dispatch(
+          productAction.updateProduct(
+            prodId,
+            formState.inputValues.title,
+            formState.inputValues.description,
+            formState.inputValues.imageUrl,
+            +formState.inputValues.price
+          )
+        );
+        setIsLoading(false);
+      } else {
+        await dispatch(
+          productAction.createProduct(
+            formState.inputValues.title,
+            formState.inputValues.description,
+            formState.inputValues.imageUrl,
+            +formState.inputValues.price
+          )
+        );
+        setIsLoading(false);
+      }
 
-    if (editProduct) {
-      dispatch(
-        productAction.updateProduct(
-          prodId,
-          formState.inputValues.title,
-          formState.inputValues.description,
-          formState.inputValues.imageUrl
-        )
-      );
-    } else {
-      dispatch(
-        productAction.createProduct(
-          formState.inputValues.title,
-          formState.inputValues.description,
-          formState.inputValues.imageUrl,
-          +formState.inputValues.price
-        )
-      );
-    }
-    setTimeout(() => {
       navigation.goBack();
-    }, 500);
+    } catch (error) {
+      setError(error.message);
+    }
   }, [dispatch, prodId, formState]);
 
   React.useLayoutEffect(() => {
@@ -162,6 +177,13 @@ const EditProductScreen = (props) => {
       ),
     });
   }, [navigation, formState]);
+
+  if (IsLoading)
+    return (
+      <View style={Styles.centered}>
+        <ActivityIndicator size={'large'} color={Colors.primary} />
+      </View>
+    );
 
   return (
     <KeyboardAvoidingView
@@ -205,6 +227,7 @@ const EditProductScreen = (props) => {
               min={0.1}
               required
               onChangeInputHandler={onChangeInputHandler}
+              initialValidation={true}
             />
           )}
           <Input
@@ -304,6 +327,11 @@ const Styles = StyleSheet.create({
     paddingVertical: 5,
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
   },
 });
 

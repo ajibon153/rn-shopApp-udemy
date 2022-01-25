@@ -1,6 +1,13 @@
 import React from 'react';
-import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
+import {
+  View,
+  Text,
+  FlatList,
+  Button,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import CustomHeaderButton from '../../components/UI/HeaderButton';
@@ -9,12 +16,21 @@ import CartItem from '../../components/Shop/CartItem';
 import Card from '../../components/UI/Card';
 import Colors from '../../constants/Colors';
 
+import * as ordersAction from '../../store/actions/OrderAction';
+
 const OrdersScreen = (props) => {
   const orders = useSelector((state) => state.order.orders);
-
+  const dispatch = useDispatch();
   const { navigation } = props;
 
-  //console.log('OrdersScreen = ', orders);
+  const [IsLoading, setIsLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsLoading(true);
+    dispatch(ordersAction.fetchOrders()).then(() => setIsLoading(false));
+    // .catch((err) => console.log('err', err));
+  }, [dispatch]);
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Orders',
@@ -32,10 +48,17 @@ const OrdersScreen = (props) => {
     });
   }, [navigation]);
 
-  if (orders.length === 0)
+  if (IsLoading)
     return (
-      <View>
-        <Text>Not have order ?</Text>
+      <View style={styles.centered}>
+        <ActivityIndicator size={'small'} color={Colors.primary} />
+      </View>
+    );
+
+  if (!IsLoading && orders.length === 0)
+    return (
+      <View style={styles.centered}>
+        <Text>Not have order , maybe start ordering now ?</Text>
       </View>
     );
 
@@ -123,5 +146,10 @@ const styles = StyleSheet.create({
   },
   detailItem: {
     width: '100%',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

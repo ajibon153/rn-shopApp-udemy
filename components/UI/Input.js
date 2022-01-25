@@ -8,8 +8,7 @@ const INPUT_FOCUS = 'INPUT_FOCUS';
 const inputReducer = (state, action) => {
   switch (action.type) {
     case INPUT_CHANGE:
-      // console.log(INPUT_CHANGE, action);
-
+      // console.log('>>>>>>>>', INPUT_CHANGE, action);
       return {
         ...state,
         value: action.value,
@@ -40,10 +39,11 @@ const Input = (props) => {
   const { onChangeInputHandler, id } = props;
 
   useEffect(() => {
+    // console.log('props', props);
     // console.log('touched', inputState.touched);
     // console.log('inputState.isValid', inputState.isValid);
     // if (inputState.touched) {
-    // console.log('==== onChangeInputHandler ====');
+    // console.log('==== onChangeInputHandler ====', inputState.touched);
     onChangeInputHandler(id, inputState.value, inputState.isValid);
     // }
   }, [inputState, onChangeInputHandler, id]);
@@ -56,12 +56,16 @@ const Input = (props) => {
     const emailRegex =
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     let isValid = true;
-    if (props.required && text.trim().length === 0) isValid = false;
-    if (props.email && !emailRegex.test(text.toLowerCase())) isValid = false;
-    if (props.min != null && +text < props.min) isValid = false;
-    // if (props.max != null && +text > props.max) isValid = false;
-    if (props.minLength != null && text.length < props.minLength)
-      isValid = false;
+    if (inputState.touched) {
+      if (props.required && text.trim().length === 0) isValid = false;
+      if (props.email && !emailRegex.test(text.toLowerCase())) isValid = false;
+      if (props.min != null && +text < props.min) isValid = false;
+      if (props.max != null && +text > props.max) isValid = false;
+      if (props.minLength != null && text.length < props.minLength)
+        isValid = false;
+    }
+    // console.log('>>>>>>> isValid', isValid);
+
     dispatch({ type: INPUT_CHANGE, value: text, isValid: isValid });
   };
 
@@ -71,7 +75,7 @@ const Input = (props) => {
   };
   const getFocusHandler = () => {
     // console.log(INPUT_FOCUS);
-    // dispatch({ type: INPUT_FOCUS });
+    dispatch({ type: INPUT_FOCUS });
   };
 
   return (

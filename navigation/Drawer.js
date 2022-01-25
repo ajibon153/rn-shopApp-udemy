@@ -14,6 +14,7 @@ import {
   CartNavigator,
   OrdersNavigator,
   AdminNavigator,
+  AuthNavigator,
 } from './ShopNavigation';
 
 import { Platform } from 'react-native';
@@ -43,6 +44,7 @@ const MyDrawer = () => {
         {/* <Drawer.Screen name='My Cart' component={CartNavigator} /> */}
         <Drawer.Screen name='Order' component={OrdersNavigator} />
         <Drawer.Screen name='Admin' component={AdminNavigator} />
+        {/* <Drawer.Screen name='Auth' component={AuthNavigator} /> */}
       </Drawer.Navigator>
     </NavigationContainer>
   );
