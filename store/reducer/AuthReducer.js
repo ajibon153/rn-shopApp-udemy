@@ -1,4 +1,4 @@
-import { SIGNUP, SIGNIN, ONAUTH } from '../actions/AuthAction';
+import { LOGOUT, AUTHENTICATE } from '../actions/AuthAction';
 const initialState = {
   token: null,
   userId: null,
@@ -6,20 +6,17 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case SIGNUP:
-      //console.log('action', action);
-
+    case AUTHENTICATE:
+      //console.log('=== AUTHENTICATE ===', action);
       return {
-        token: action.data.accessToken,
-        userId: action.data.uid,
+        token: action.token,
+        userId: action.userId,
       };
-    case SIGNIN:
-      //console.log('action', action);
 
-      return {
-        token: action.data.accessToken,
-        userId: action.data.uid,
-      };
+    case LOGOUT:
+      //console.log('Logout', initialState);
+      return initialState;
+
     default:
       return state;
   }

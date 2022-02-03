@@ -12,6 +12,7 @@ import UserProductScreen from '../screens/user/UserProductScreen';
 import EditProductScreen from '../screens/user/EditProductScreen';
 import AuthScreen from '../screens/user/AuthScreen';
 import SignUpScreen from '../screens/user/SignUpScreen';
+import StartUpScreen, { LogoutScreen } from '../screens/StartUpScreen';
 
 import Colors from '../constants/Colors';
 
@@ -77,37 +78,46 @@ const OrdersNavigator = () => {
   );
 };
 const AdminNavigator = () => {
-  const UID = useSelector((state) => state.auth.userId);
-  console.log('UID', UID);
+  //console.log('UID AdminNavigator', UID);
   return (
     <Stack.Navigator
       screenOptions={{
         ...Styles,
       }}
     >
-      {UID ? (
-        <Stack.Screen name='MyProducts' component={UserProductScreen} />
-      ) : (
-        <Stack.Screen name='Auth' component={AuthScreen} />
-      )}
+      {/* <Stack.Screen name='StartUp' component={StartUpScreen} /> */}
+      {/* {UID ? ( */}
+      <Stack.Screen name='Auth' component={AuthScreen} />
+      <Stack.Screen name='MyProducts' component={UserProductScreen} />
+      {/* ) : ( */}
+      {/* )} */}
 
       <Stack.Screen name='EditProduct' component={EditProductScreen} />
     </Stack.Navigator>
   );
 };
 
-const HomeNavigator = () => {
+const HomeNavigator = (props) => {
+  const UID = useSelector((state) => state.auth.userId);
+
+  React.useEffect(() => {
+    // console.log('HomeNavigator', UID, props);
+    if (!UID) props.navigation.navigate('Logout');
+  }, [UID]);
   return (
     <Stack.Navigator
       screenOptions={{
         ...Styles,
       }}
     >
+      <Stack.Screen name='StartUp' component={StartUpScreen} />
       <Stack.Screen name='ProductOverview' component={ProductOverviewScreen} />
       <Stack.Screen name='ProductDetail' component={ProductDetailScreen} />
       <Stack.Screen name='Cart' component={CartScreen} />
       <Stack.Screen name='Orders' component={OrdersScreen} />
-      <Stack.Screen name='Admin' component={OrdersScreen} />
+      <Stack.Screen name='MyProducts' component={UserProductScreen} />
+      <Stack.Screen name='Auth' component={AuthScreen} />
+      <Stack.Screen name='Logout' component={LogoutScreen} />
     </Stack.Navigator>
   );
 };

@@ -32,7 +32,13 @@ const UserProductScreen = (props) => {
   };
 
   React.useEffect(() => {
-    if (!UID) navigation.navigate('Auth');
+    //console.log('UserProductScreen UID', UID);
+    //console.log('UserProductScreen userProducts', userProducts);
+    if (!UID) {
+      navigation.navigate('Auth');
+    } else {
+      dispatch(productAction.fetchProducts());
+    }
   }, [UID]);
 
   React.useLayoutEffect(() => {
@@ -41,13 +47,22 @@ const UserProductScreen = (props) => {
       headerLeft: () => (
         <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
           <Item
-            title='back'
-            iconName={'ios-arrow-back'}
+            title='Cart'
+            iconName={'md-menu'}
             onPress={() => {
-              navigation.goBack();
+              navigation.toggleDrawer();
             }}
           />
         </HeaderButtons>
+        // <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+        //   <Item
+        //     title='back'
+        //     iconName={'ios-arrow-back'}
+        //     onPress={() => {
+        //       navigation.goBack();
+        //     }}
+        //   />
+        // </HeaderButtons>
       ),
 
       headerRight: () => (

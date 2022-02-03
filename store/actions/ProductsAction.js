@@ -29,7 +29,7 @@ export const fetchProducts = () => (dispatch, getState) => {
     onValue(url, (snapshot) => {
       const data = [];
       let snapVal = snapshot.val();
-      console.log('snapVal', snapVal);
+      // console.log('snapVal', snapVal);
       if (snapVal) {
         Object.keys(snapshot.val()).map((key) => {
           data.push(
@@ -45,7 +45,7 @@ export const fetchProducts = () => (dispatch, getState) => {
         });
       }
       // console.log('==========================');
-      console.log('fetchProducts3', data);
+      // console.log('fetchProducts3', data);
       dispatch({
         type: SET_PRODUCTS,
         products: data,

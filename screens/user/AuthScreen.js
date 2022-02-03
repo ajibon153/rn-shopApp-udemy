@@ -57,6 +57,7 @@ const AuthScreen = (props) => {
   const [IsSignUp, setIsSignUp] = React.useState(false);
 
   const dispatch = useDispatch();
+  const UID = useSelector((state) => state.auth.userId);
 
   const [formState, dispatchFromState] = React.useReducer(formReducer, {
     inputValues: {
@@ -76,6 +77,11 @@ const AuthScreen = (props) => {
         { text: 'Okay' },
       ]);
   }, [IsError]);
+
+  React.useEffect(() => {
+    //console.log('UID authScreen', UID);
+    if (UID) navigation.navigate('MyProducts');
+  }, [UID, dispatch]);
 
   const onChangeInputHandler = React.useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
@@ -117,15 +123,14 @@ const AuthScreen = (props) => {
     setIsLoading(true);
     try {
       let check = await dispatch(action);
-      //console.log('check', check);
+      //console.log('==== check ====', check);
       if (check.success) {
-        //console.log('BERHASIL !');
+        //console.log('navigation', navigation);
         navigation.navigate('MyProducts');
       } else {
         setIsError(check.error);
       }
     } catch (error) {
-      //console.log('authHandler err', error);
       setIsError(error.message);
     }
     setIsLoading(false);
@@ -140,9 +145,10 @@ const AuthScreen = (props) => {
         <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
           <Item
             title='back'
-            iconName={'ios-arrow-back'}
+            iconName={'md-menu'}
             onPress={() => {
-              navigation.goBack();
+              // navigation.goBack();
+              navigation.toggleDrawer();
             }}
           />
         </HeaderButtons>

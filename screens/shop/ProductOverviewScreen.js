@@ -83,7 +83,7 @@ const ProductOverviewScreen = (props) => {
       headerLeft: () => (
         <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
           <Item
-            title='Cart'
+            title='Menu'
             iconName={'md-menu'}
             onPress={() => {
               navigation.toggleDrawer();

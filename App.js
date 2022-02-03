@@ -15,14 +15,27 @@ import ProductReducer from './store/reducer/ProductReducer';
 import CartReducer from './store/reducer/CartReducer';
 import AuthReducer from './store/reducer/AuthReducer';
 import OrderReducer from './store/reducer/OrderReducer';
+import PlaceReducer from './store/reducer/PlaceReducer';
 // import ShopNavigation from './navigation/ShopNavigation';
 import MyDrawer from './navigation/Drawer';
+// import NavigationContainer from './navigation/NavigationContainer';
+
+import { init } from './helper/db';
+
+init()
+  .then(() => {
+    //console.log('Initialized');
+  })
+  .catch((err) => {
+    //console.log(err);
+  });
 
 const rootReducer = combineReducers({
   products: ProductReducer,
   cart: CartReducer,
   order: OrderReducer,
   auth: AuthReducer,
+  places: PlaceReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
@@ -54,6 +67,7 @@ export default function App() {
     <>
       <Provider store={store}>
         <MyDrawer />
+        {/* <NavigationContainer /> */}
         {/* <ShopNavigation /> */}
       </Provider>
     </>

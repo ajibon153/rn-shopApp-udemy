@@ -1,14 +1,14 @@
-import { createDrawerNavigator } from "react-navigation-drawer";
+import { createDrawerNavigator } from 'react-navigation-drawer';
 import { createAppContainer } from 'react-navigation';
-import {ProductNavigator, OrdersNavigator} from "./ShopNavigation";
+import { ProductNavigator, OrdersNavigator } from './ShopNavigation';
 
 const RootDrawerNavigation = createDrawerNavigator({
-  Products:{
-    screen: ProductNavigator
+  Products: {
+    screen: ProductNavigator,
   },
-  Orders:{
-    screen: OrdersNavigator
+  Orders: {
+    screen: OrdersNavigator,
   },
-})
+});
 
-export default createAppContainer(RootDrawerNavigation)
+export default createAppContainer(RootDrawerNavigation);

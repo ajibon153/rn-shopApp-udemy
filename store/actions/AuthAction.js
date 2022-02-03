@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -6,25 +8,34 @@ import {
 
 export const SIGNUP = 'SIGNUP';
 export const SIGNIN = 'SIGNIN';
-export const ONAUTH = 'ONAUTH';
+export const AUTHENTICATE = 'AUTHENTICATE';
+export const LOGOUT = 'LOGOUT';
 
 const auth = getAuth();
+
+export const Authenticate = (userId, token, expireTime) => {
+  //console.log('Authenticate', userId, token);
+  return (dispatch) => {
+    if (expireTime) dispatch(setLogoutTimer(parseInt(expireTime)));
+    dispatch({ type: AUTHENTICATE, userId, token });
+  };
+};
 
 export const signupAuthenticate = (email, password) => {
   return async (dispatch, getState) => {
     let data;
     //console.log('getState', getState());
     // console.log('auth', auth);
-    console.log('email', email);
-    console.log('password', password);
+    //console.log('email', email);
+    //console.log('password', password);
     await createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        // console.log('user signup', user);
         data = {
           success: true,
           uid: user.uid,
           accessToken: user.stsTokenManager.accessToken,
+          expire: user.stsTokenManager.expirationTime,
         };
         // data = user;
       })
@@ -38,7 +49,11 @@ export const signupAuthenticate = (email, password) => {
         throw new Error(message);
       });
     // console.log('data', data);
-    dispatch({ type: SIGNUP, data });
+    //console.log('user signup', data);
+
+    dispatch(Authenticate(data.uid, data.accessToken, data.expire));
+    saveDataToStorage(data.accessToken, data.uid, data.expire);
+
     return data;
   };
 };
@@ -48,16 +63,16 @@ export const signinAuthenticate = (email, password) => {
     let data;
     //console.log('getState', getState());
     // console.log('auth', auth);
-    console.log('email', email);
-    console.log('password', password);
+    //console.log('email', email);
+    //console.log('password', password);
     await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log('user signin', user);
         data = {
           success: true,
           uid: user.uid,
           accessToken: user.stsTokenManager.accessToken,
+          expire: user.stsTokenManager.expirationTime,
         };
         // data = user;
       })
@@ -71,7 +86,10 @@ export const signinAuthenticate = (email, password) => {
         throw new Error(message);
       });
     // console.log('data', data);
-    dispatch({ type: SIGNUP, data });
+    //console.log('user signin', data);
+
+    dispatch(Authenticate(data.uid, data.accessToken, data.expire));
+    saveDataToStorage(data.accessToken, data.uid, data.expire);
     return data;
   };
 };
@@ -90,7 +108,46 @@ export const onAuthenticate = (email, password) => {
   };
 };
 
+export const logoutAct = () => {
+  return (dispatch) => {
+    // clearLogoutTimer();
+    //console.log('logoutAct');
+    AsyncStorage.removeItem('userData');
+    dispatch({ type: LOGOUT });
+  };
+};
+
 // ===============================
+
+const clearLogoutTimer = (timer) => {
+  if (timer) clearTimeout(timer);
+};
+
+const setLogoutTimer = (expireTime) => {
+  return (dispatch) => {
+    //console.log('setLogoutTimer', expireTime);
+    setTimeout(() => {
+      dispatch(logoutAct());
+    }, expireTime);
+  };
+};
+
+const saveDataToStorage = (token, userId, expire) => {
+  //console.log('saveDataToStorage', token, userId, expire);
+  const expirationDate = new Date(
+    new Date().getTime() + parseInt(expire) * 1000
+  ).toISOString();
+  //console.log('expirationDate', expirationDate);
+  AsyncStorage.setItem(
+    'userData',
+    JSON.stringify({
+      token,
+      userId,
+      expiryDate: expirationDate,
+    })
+  );
+};
+
 function getErrorMessage(error) {
   //console.log('getErrorMessage', error);
   let errmes = [
@@ -132,4 +189,5 @@ function getErrorMessage(error) {
   if (!find) find = { message: 'Gagal authentifikasi' };
   return find.message;
 }
+
 // ===============================
